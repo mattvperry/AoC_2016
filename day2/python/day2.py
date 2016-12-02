@@ -39,8 +39,8 @@ def keys(input, keypad, currentLoc):
     moves = makeMoves(keypad)
     for num in (x for x in input.strip().split("\n")):
         for move in num:
-            newLoc = moves[move](currentLoc)
-            currentLoc = newLoc if keypad[newLoc[0]][newLoc[1]] != _ else currentLoc
+            newX, newY = moves[move](currentLoc)
+            currentLoc = (newX, newY) if keypad[newX][newY] != _ else currentLoc
         yield currentLoc
 
 print("".join([str(keypad1[y][x]) for x, y in keys(input, keypad1, (2, 2))]))
