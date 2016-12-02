@@ -27,7 +27,6 @@ keypad2 = [
 ]
 
 def makeMoves(keypad):
-    s = len(keypad) - 1
     return {
         'U': lambda loc: (loc[0], loc[1] - 1),
         'D': lambda loc: (loc[0], loc[1] + 1),
