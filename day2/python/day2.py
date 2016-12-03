@@ -26,16 +26,14 @@ keypad2 = [
     [_, _, _, _, _, _, _]
 ]
 
-def makeMoves(keypad):
-    return {
-        'U': lambda loc: (loc[0], loc[1] - 1),
-        'D': lambda loc: (loc[0], loc[1] + 1),
-        'L': lambda loc: (loc[0] - 1, loc[1]),
-        'R': lambda loc: (loc[0] + 1, loc[1])
-    }
+moves = {
+    'U': lambda loc: (loc[0], loc[1] - 1),
+    'D': lambda loc: (loc[0], loc[1] + 1),
+    'L': lambda loc: (loc[0] - 1, loc[1]),
+    'R': lambda loc: (loc[0] + 1, loc[1])
+}
 
 def keys(input, keypad, currentLoc):
-    moves = makeMoves(keypad)
     for num in (x for x in input.strip().split("\n")):
         for move in num:
             newX, newY = moves[move](currentLoc)
