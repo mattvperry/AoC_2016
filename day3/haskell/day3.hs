@@ -11,9 +11,7 @@ parseSides :: [String] -> [[Integer]]
 parseSides = map (map read . words)
 
 valid :: [Integer] -> Bool
-valid (x:y:z:[])
-    | x + y > z && y + z > x && x + z > y = True
-    | otherwise = False
+valid [x, y, z] = all id $ zipWith (>) [x + y, y + z, x + z] [z, x, y]
 valid _ = False
 
 rotate :: [[Integer]] -> [[Integer]]
