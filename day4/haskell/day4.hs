@@ -1,12 +1,13 @@
 import Control.Arrow ((&&&))
-import Data.List (break, group, sort)
+import Data.List (cycle, break, find, group, isPrefixOf, sort)
+import Data.Maybe (fromJust)
 
-type Room = (String, Integer, String)
+type Room = (String, Int, String)
 
 getName :: Room -> String
 getName (n, _, _) = n
 
-getId :: Room -> Integer
+getId :: Room -> Int
 getId (_, i, _) = i
 
 getCsc :: Room -> String
@@ -25,16 +26,27 @@ counter :: Ord a => [a] -> [(a, Int)]
 counter = map (head &&& length) . group . sort
 
 calculateCsc :: String -> String
-calculateCsc = take 5 . map snd . sort . map go . counter . filter (/='-')
-    where go (a, b) = (negate b, a)
+calculateCsc = take 5 . map snd . sort . map f . counter . filter (/='-')
+    where f (a, b) = (negate b, a)
 
 validRoom :: Room -> Bool
 validRoom = (==) <$> getCsc <*> calculateCsc . getName
 
-part1 :: [Room] -> Integer
+decryptChar :: Int -> Char -> Char
+decryptChar _ '-'   = ' '
+decryptChar n c     = ([c .. 'z'] ++ cycle ['a' .. 'z']) !! n
+
+decryptName :: Room -> Room
+decryptName (n, i, c) = (map (decryptChar i) n, i, c)
+
+part1 :: [Room] -> Int
 part1 = sum . map getId
+
+part2 :: [Room] -> Int
+part2 = getId . fromJust . find (isPrefixOf "northpole" . getName) . map decryptName
 
 main :: IO ()
 main = do
     validRooms <- filter validRoom . map parseRoom <$> readInput
     print . part1 $ validRooms
+    print . part2 $ validRooms

@@ -5,12 +5,12 @@ from string import ascii_lowercase
 def parseRoom(line):
     line = line.split('-')
     id, checksum = match(r'(\d+)\[([a-z]+)\]', line[-1]).groups()
-    return "-".join(line[0:-1]), int(id), checksum
+    return "-".join(line[:-1]), int(id), checksum
 
 def validRoom(name, checksum):
     count = Counter(name.replace('-', '')).items()
     count = sorted((v * -1, k) for k, v in count)
-    return "".join(c for _, c in count) == checksum
+    return "".join(c for _, c in count[:5]) == (checksum)
 
 def decryptChar(char, inc):
     if char == '-':
