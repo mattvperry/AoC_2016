@@ -1,6 +1,5 @@
 from re import match
 from collections import Counter
-from operator import itemgetter
 from string import ascii_lowercase
 
 def parseRoom(line):
@@ -9,9 +8,9 @@ def parseRoom(line):
     return "-".join(line[0:-1]), int(id), checksum
 
 def validRoom(name, checksum):
-    count = sorted(Counter(name.replace("-", "")).items())
-    count = sorted(count, key=itemgetter(1), reverse=True)
-    return "".join(map(itemgetter(0), count[0:5])) == checksum
+    count = Counter(name.replace('-', '')).items()
+    count = sorted((v * -1, k) for k, v in count)
+    return "".join(c for _, c in count) == checksum
 
 def decryptChar(char, inc):
     if char == '-':
@@ -30,7 +29,7 @@ def part2(rooms):
             return id
 
 def day4(input):
-    validRooms = list([(name, id) for name, id, csc in map(parseRoom, input) if validRoom(name, csc)])
+    validRooms = [(name, id) for name, id, csc in map(parseRoom, input) if validRoom(name, csc)]
     return part1(validRooms), part2(validRooms)
 
 input = open("../input.txt").read()
