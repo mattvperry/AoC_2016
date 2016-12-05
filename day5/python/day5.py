@@ -24,9 +24,9 @@ def part2(input):
         if ans[int(hash[5])] != ' ':
             continue
         ans[int(hash[5])] = hash[6]
-    return ans
+    return "".join(ans)
 
 def day5(input):
-    return part2(input)
+    return part1(input), part2(input)
 
 print(day5("ugkcyxxp"))
