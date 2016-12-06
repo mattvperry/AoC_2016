@@ -1,10 +1,9 @@
 import Control.Arrow ((&&&))
-import Data.List (transpose, sort, sortBy, group)
-import Data.Ord (comparing)
+import Data.List (transpose, sort, group)
 
 colFreq :: Ord a => [a] -> [a]
-colFreq = map fst . sortBy (comparing snd) . freqs
-    where freqs = map (head &&& length) . group . sort
+colFreq = map snd . sort . count
+    where count = map (length &&& head) . group . sort
 
 decode :: Ord a => ([a] -> a) -> [[a]] -> [a]
 decode f = map (f . colFreq) . transpose
