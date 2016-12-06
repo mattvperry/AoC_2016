@@ -11,5 +11,4 @@ decode f = map (f . colFreq) . transpose
 main :: IO ()
 main = do
     input <- lines <$> readFile "../input.txt"
-    print . decode last $ input
-    print . decode head $ input
+    print (decode last input, decode head input)
