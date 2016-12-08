@@ -16,9 +16,6 @@ def supportsTls(ip):
     supernet, hypernet = splitIp(ip)
     return any(hasAbba(x) for x in supernet) and not any(hasAbba(x) for x in hypernet)
 
-def toBab(aba):
-    return "".join([aba[1], aba[0], aba[1]])
-
 def supportsSsl(ip):
     supernet, hypernet = splitIp(ip)
     babs = chain(*(findBabs(x) for x in supernet)) 
