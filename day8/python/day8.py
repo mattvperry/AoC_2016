@@ -26,8 +26,8 @@ def rotateCol(a, b, screen):
     screen = rotateRow(a, b, screen)
     return transpose(screen)
 
-def countLit(row):
-    return len(list(filter(lambda x: x == '#', row)))
+def countLit(screen):
+    return sum(map(lambda x: x.count('#'), screen))
 
 def lightScreen(input):
     screen = makeScreen(50, 6)
@@ -42,7 +42,7 @@ def lightScreen(input):
 
 def day8(input):
     screen = lightScreen(input)
-    print(sum(map(countLit, screen)))
+    print(countLit(screen))
     return "\n".join("".join(x) for x in screen)
 
 input = open("../input.txt").read()
