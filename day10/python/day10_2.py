@@ -31,8 +31,8 @@ def botEval(inputs, cmds, bins):
         bins[bot] = bins[bot](int(val))
 
 def getOutputs(bins):
-    outputBins = ((k, v) for k, v in bins.items() if k.startswith("output"))
-    return [v for k, v in sorted(outputBins, key=lambda x: int(x[0].split(" ")[-1]))]
+    outputBins = ((int(k.split(" ")[-1]), v) for k, v in bins.items() if k.startswith("output"))
+    return [v for k, v in sorted(outputBins, key=itemgetter(0))]
 
 def day10(input):
     inputs, cmds = partition(lambda s: s.startswith("bot"), input)

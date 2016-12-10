@@ -39,9 +39,11 @@ def part1(input):
     inputs, cmds = partition(lambda s: s.startswith("bot"), input)
     inputs = [value.match(x).groups() for x in inputs]
     cmds = [botcmp.match(x).groups() for x in cmds]
+
     bins = {x:Bin(x) for x in chain.from_iterable(cmds)} 
     defineBots(cmds, bins)
     init(inputs, bins)
+
     return bins['output 0'].chips[0] * bins['output 1'].chips[0] * bins['output 2'].chips[0]
 
 def day10(input):
