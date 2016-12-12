@@ -1,99 +1,71 @@
 from operator import itemgetter
 from itertools import combinations, chain, product, groupby
-from random import choice
+from heapq import heappush, heappop
 
-import pprint
-pp = pprint.PrettyPrinter(indent = 2)
+def validFloor(floor):
+    if not floor or floor[-1] < 0:
+        return True
+    return all(-chip in floor for chip in floor if chip < 0)
 
-def validCombo(items):
-    elems = {k:list(map(itemgetter(1), v)) for k, v in groupby(items, itemgetter(0))}
-    # Has a generator
-    hasGen = 'G' in map(itemgetter(1), items)
-    # Has an unprotected microchip
-    loneM = any(k for k, v in elems.items() if not 'G' in v and 'M' in v)
-    return not (hasGen and loneM)
-
-def validMoves(state):
+def moves(state):
     elevator, floors = state
     floor = floors[elevator]
-    # Valid sets of items to take on elevator
-    combos = chain(map(lambda x: [x], floor), filter(validCombo, combinations(floor, 2)))
+    # Sets of items to take on elevator
+    combos = chain(map(lambda x: (x,), floor), combinations(floor, 2))
     # Valid directions to move elevator
-    dirs = filter(lambda  d: elevator + d in range(4), (1, -1))
+    dirs = filter(lambda  d: 0 <= elevator + d < 4, (1, -1))
     # Cartesian product of directions to move elevator and sets of items to take
     return product(dirs, combos)
 
-def validFloors(floors):
-    return all(map(validCombo, floors))
-
-def makeMove(state, move):
+def makeValidMove(state, move):
     elevator, floors = state
-    newFloors = floors[:]
     direction, itemSet = move
-    newFloors[elevator] = [x for x in newFloors[elevator] if x not in itemSet]
-    newFloors[elevator + direction] = newFloors[elevator + direction] + list(itemSet)    
-    return elevator + direction, newFloors
 
-def stateEq(state1, state2):
-    (e1, f1), (e2, f2) = state1, state2
-    return e1 == e2 and all(set(x) == set(y) for x, y in zip(f1, f2))
+    newFloors = list(floors)
+    newFloors[elevator] = tuple(x for x in floors[elevator] if x not in itemSet)
+    newFloors[elevator + direction] = tuple(sorted(floors[elevator + direction] + itemSet))
 
-def makeAllMoves(state, prevStates):
-    states = (makeMove(state, move) for move in validMoves(state))
-    states = ((e, f) for e, f in states if validFloors(f))
-    return (s for s in states if not any(stateEq(s, p) for p in prevStates))
+    if validFloor(newFloors[elevator]) and validFloor(newFloors[elevator + direction]):
+        return elevator + direction, tuple(newFloors)
 
-def finished(state):
-    _, floors = state
-    sizes = list(map(len, floors))
-    return all(x == 0 for x in sizes[1:])
+def makeAllMoves(state):
+    states = (makeValidMove(state, move) for move in moves(state))
+    return (s for s in states if s)
 
-"""
-def bfs(state):
-    queue = [(state, [state])]
+def aStar(initial):
+    queue = []
+    heappush(queue, (0, initial))
+    cost = { initial: 0 }
+
     while queue:
-        (s, path) = queue.pop(0)
-        for next in makeAllMoves(s, path):
-            if finished(next):
-                yield path + [next]
-            else:
-                queue.append((next, path + [next]))
-
-"""
-def bfs(state):
-    steps = 0
-    visited, queue = [], [state]
-    while not any(1 for s in queue if finished(s)):
-        print(steps, len(queue))
-        visited = visited + queue
-        queue = [n for s in queue for n in makeAllMoves(s, visited)]
-        steps += 1
-    return steps
+        _, state = heappop(queue)
+        e, f = state
+        if all(x == () for x in f[1:]):
+            return cost[state]
+        
+        for next in makeAllMoves(state):
+            newCost = cost[state] + 1
+            if next not in cost or newCost < cost[next]:
+                cost[next] = newCost
+                prio = newCost - len(next[1][0]) * 10
+                heappush(queue, (prio, next))
 
 def day11(elevator, floors):
-    """
-    final = next(bfs((elevator, floors)))
-    pp.pprint(final)
-    return len(final) - 1
-    """
-    return bfs((elevator, floors))
+    return aStar((elevator, floors))
 
-# Initial State
+pr, co, cu, ru, pl, el, di = 1, 2, 3, 4, 5, 6, 7
 elevator = 3
-"""
-floors = [
-    [],
-    [('Co', 'M'), ('Cu', 'M'), ('Ru', 'M'), ('Pl', 'M')],
-    [('Co', 'G'), ('Cu', 'G'), ('Ru', 'G'), ('Pl', 'G')],
-    [('Pr', 'G'), ('Pr', 'M')]
-]
+floors1 = (
+    (),
+    tuple(sorted((-co, -cu, -ru, -pl))),
+    tuple(sorted(( co,  cu,  ru,  pl))),
+    tuple(sorted(( pr, -pr)))
+)
+floors2 = (
+    (),
+    tuple(sorted((-co, -cu, -ru, -pl))),
+    tuple(sorted(( co,  cu,  ru,  pl))),
+    tuple(sorted(( pr, -pr,  el, -el,  di, -di)))
+)
 
-"""
-floors = [
-    [],
-    [('L', 'G')],
-    [('H', 'G')],
-    [('H', 'M'), ('L', 'M')]
-]
-
-print(day11(elevator, floors))
+print(day11(elevator, floors1))
