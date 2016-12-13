@@ -2,34 +2,40 @@ from re import compile
 
 instr = compile(r'(\w\w\w) ([^\s]*)(?: ([^\s]*))?')
 
-def makeProcessor(state):
-    regOrInt = lambda x: int(state['regs'][x]) if x in state['regs'] else int(x)
-    def setReg(name, val):
-        state['regs'][name] = val
-    
-    def setPc(val):
-        state['pc'] = val
+def lookup(param, state):
+    _, regs = state
+    return int(regs[param]) if param in regs else int(param)
 
-    return {
-        'cpy': lambda x, y: setReg(y, regOrInt(x)),
-        'inc': lambda x, _: setReg(x, state['regs'][x] + 1),
-        'dec': lambda x, _: setReg(x, state['regs'][x] - 1),
-        'jnz': lambda x, y: setPc(state['pc'] + regOrInt(y) - 1 if regOrInt(x) != 0 else state['pc'])
-    }
+def setReg(to, val, state):
+    pc, regs = state
+    regs[to] = val
+    return (pc, regs)
+
+def setPc(val, state):
+    pc, regs = state
+    return (pc + val, regs)
+
+def halted(state, code):
+    pc, _ = state
+    return pc >= len(code)
 
 def execute(input):
-    state = {
-        'pc': 0,
-        'regs': { 'a': 0, 'b': 0, 'c': 1, 'd': 0 }
+    code = [instr.match(x).groups() for x in input]
+    state = (0, { 'a': 0, 'b': 0, 'c': 1, 'd': 0 })
+    proc = {
+        'cpy': lambda x, y: setReg(y, lookup(x, state), state),
+        'inc': lambda x, _: setReg(x, lookup(x, state) + 1, state),
+        'dec': lambda x, _: setReg(x, lookup(x, state) - 1, state),
+        'jnz': lambda x, y: setPc(lookup(y, state) - 1, state) if lookup(x, state) != 0 else state
     }
 
-    proc = makeProcessor(state)
-    code = [instr.match(x).groups() for x in input]
-    while state['pc'] < len(code):
-        ins, *args = code[state['pc']]
-        proc[ins](*args)
-        state['pc'] += 1
-    return state['regs']
+    while not halted(state, code):
+        pc, regs = state
+        ins, *args = code[pc]
+        pc, regs = proc[ins](*args)
+        state = (pc + 1, regs)
+
+    return state
 
 def day12(input):
     return execute(input)
