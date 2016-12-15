@@ -10,8 +10,8 @@ isSlot :: (Int, Int) -> Int -> Bool
 isSlot (o, p) t = (o + t) `mod` p == 0
 
 time :: [(Int, Int)] -> Maybe Int
-time ds = findIndex (all id) $ zipWith isSlot <$> repeat ds <*> runs
-    where runs = drop 1 $ flip windows [0..] (length ds)
+time ds = findIndex (all id) $ zipWith isSlot <$> repeat ds <*> runs ds
+    where runs = drop 1 . flip windows [0..] . length
 
 main :: IO ()
 main = do
