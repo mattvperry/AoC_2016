@@ -4,11 +4,8 @@ input = "^..^^.^^^..^^.^...^^^^^....^.^..^^^.^.^.^^...^.^.^.^.^^.....^.^^.^.^.^.
 
 def nextRow(prev):
     prev = [True] + prev + [True]
-    for p in zip(prev, prev[1:], prev[2:]):
-        if p in [(False, False, True), (True, False, False), (False, True, True), (True, True, False)]:
-            yield False
-        else:
-            yield True
+    for l, c, r in zip(prev, prev[1:], prev[2:]):
+        yield l == r
 
 def makeRows(row):
     yield row
