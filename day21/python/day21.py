@@ -21,7 +21,7 @@ def rotate(pword, dir, x):
 
 def rotatePos(pword, x):
     n = pword.index(x)
-    return rotate(pword, -1, 1 + n + (0 if n < 4 else 1))
+    return rotate(pword, -1, n + (1 if n < 4 else 2))
 
 def reverse(pword, x, y):
     return list(chain(pword[:x], reversed(pword[x:y + 1]), pword[y + 1:]))
