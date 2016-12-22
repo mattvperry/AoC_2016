@@ -1,4 +1,4 @@
-import Data.List (elemIndex, splitAt)
+import Data.List (elemIndex, splitAt, foldl')
 
 data Instruction = 
     Swap Char Char 
@@ -55,7 +55,7 @@ execR s (RotatePos c)    = head $ filter f [exec s (RotateLeft x) | x <- [1..]]
     where f = (== s) . flip exec (RotatePos c)
 
 run :: (String -> Instruction -> String) -> String -> [String] -> String
-run f s = foldl f s . map (parse . words)
+run f s = foldl' f s . map (parse . words)
 
 main :: IO ()
 main = do
