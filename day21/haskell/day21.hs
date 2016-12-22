@@ -41,7 +41,7 @@ exec s (RotatePos c)    = exec s (RotateRight (f . elemIndex c $ s))
 exec s (Reverse x y)    = take x s ++ m ++ drop (y + 1) s
     where m = reverse . take (y - x + 1) . drop x $ s
 exec s (Move x y)       = c ++ b:d
-    where (a, b:bs)   = splitAt x s
+    where (a, b:bs)     = splitAt x s
           (c, d)        = splitAt y (a ++ bs)
 
 execR :: String -> Instruction -> String
