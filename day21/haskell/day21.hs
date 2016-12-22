@@ -45,14 +45,12 @@ exec s (Move x y)       = c ++ b:d
           (c, d)        = splitAt y (a ++ bs)
 
 execR :: String -> Instruction -> String
-execR s (Swap a b)       = exec s (Swap a b)
-execR s (SwapPos x y)    = exec s (SwapPos x y)
-execR s (RotateLeft x)   = exec s (RotateRight x)
-execR s (RotateRight x)  = exec s (RotateLeft x)
-execR s (Reverse x y)    = exec s (Reverse x y)
-execR s (Move x y)       = exec s (Move y x)
-execR s (RotatePos c)    = head $ filter f [exec s (RotateLeft x) | x <- [1..]]
+execR s (Move x y)      = exec s (Move y x) 
+execR s (RotateLeft x)  = exec s (RotateRight x)
+execR s (RotateRight x) = exec s (RotateLeft x)
+execR s (RotatePos c)   = head $ filter f [exec s (RotateLeft x) | x <- [1..]]
     where f = (== s) . flip exec (RotatePos c)
+execR s i               = exec s i
 
 run :: (String -> Instruction -> String) -> String -> [String] -> String
 run f s = foldl' f s . map (parse . words)
